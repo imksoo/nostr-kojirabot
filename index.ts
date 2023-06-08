@@ -36,7 +36,7 @@ function filterEvent(event: Nostr.Event): boolean {
   return event.content.includes("こじら");
 }
 
-function replyEvent(event: Nostr.Event) {
+function replyEvent(event: Nostr.Event): void {
   const reply = {
     sig: "",
     id: "",
