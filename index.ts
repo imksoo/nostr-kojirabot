@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const MyPubkey = process.env.BOT_PUBKEY;
+const MySecret = process.env.BOT_SECRET;
+
 const pool = new RelayPool(undefined, {
   autoReconnect: true,
   logErrorsAndNotices: true,
@@ -21,7 +24,7 @@ pool.subscribe(
   [
     {
       kinds: [1],
-      since: Math.floor(new Date().getTime() / 1000 - 10 * 60),
+      since: Math.floor(new Date().getTime() / 1000 - 1 * 60),
     },
   ],
   feedRelays,
@@ -33,7 +36,7 @@ pool.subscribe(
 );
 
 function filterEvent(event: Nostr.Event): boolean {
-  return event.content.includes("こじら");
+  return event.pubkey !== MyPubkey && event.content.includes("こじら");
 }
 
 function replyEvent(event: Nostr.Event): void {
@@ -41,17 +44,14 @@ function replyEvent(event: Nostr.Event): void {
     sig: "",
     id: "",
     kind: 1,
-    tags: [
-      ["e", event.id, "", "reply"],
-      ["p", event.pubkey],
-    ],
-    pubkey: process.env.BOT_PUBKEY ?? "",
+    tags: [...event.tags, ["e", event.id, "", "reply"], ["p", event.pubkey]],
+    pubkey: MyPubkey ?? "",
     content: "呼んだ？",
     created_at: event.created_at + 1,
   };
 
   reply.id = Nostr.getEventHash(reply);
-  reply.sig = Nostr.getSignature(reply, process.env.BOT_SECRET ?? "");
+  reply.sig = Nostr.getSignature(reply, MySecret ?? "");
 
   const validateEvent = Nostr.validateEvent(reply);
   const verifySignature = Nostr.verifySignature(reply);
