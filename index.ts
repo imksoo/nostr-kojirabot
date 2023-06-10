@@ -40,9 +40,9 @@ function filterEvent(event: Nostr.Event): boolean {
     return false;
   }
 
-  if (event.content.match(/こじら[さん|氏]/)) {
+  if (event.content.match(/こじら[さん|氏|にゃん]/)) {
     return false;
-  } else if (event.content.match(/こじら[せ]/)) {
+  } else if (event.content.match(/こじら[さ-それず]/)) {
     return true;
   }
   return false;
